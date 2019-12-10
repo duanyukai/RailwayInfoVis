@@ -1,0 +1,28 @@
+@import '~bootstrap/dist/css/bootstrap.min.css';
+@import "~leaflet/dist/leaflet.css";
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: '微软雅黑', Arial, sans-serif;
+}
+
+body.fontLoaded {
+  font-family: '微软雅黑', Arial, sans-serif;
+}
+
+#app {
+  background-color: #fafafa;
+  min-height: 100%;
+  min-width: 100%;
+}
+
+p,
+label {
+  font-family: Georgia, Times, 'Times New Roman', serif;
+  line-height: 1.5em;
+}
