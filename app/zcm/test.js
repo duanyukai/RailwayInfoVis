@@ -59,22 +59,21 @@ function findAllConnections(){
   return res;
 }
 
-function findDestinationByScale(startPos, scale, dimension= 'step'){
-  let res = [startPos];
+function findDestinationByScale(startPos, scale, dimension= 'step', res){
   for(const endPos in info[startPos]){
-    if(info[startPos][endPos][dimension] <= scale) {
-      res.push(endPos);
-      res = res.concat(findDestinationByScale(endPos, scale - info[startPos][endPos][dimension], dimension));
+    if(info[startPos][endPos][dimension] <= scale && info[startPos][endPos][dimension] != 0 && !res.has(endPos)) {
+      res.add(endPos);
+      findDestinationByScale(endPos, scale - info[startPos][endPos][dimension], dimension, res);
     }
   }
   return res;
 }
 
 function findPartialConnections(startPos, scale, dimension= 'step'){
-  let des = findDestinationByScale(startPos, scale, dimension);
-  let temp = new Set(des);
+  let des = new Set();
+  findDestinationByScale(startPos, scale, dimension, des);
   let res = [];
-  for(const endPos of temp){
+  for(const endPos of des){
     res.push([startPos, endPos]);
   }
   return res;
@@ -95,10 +94,10 @@ function findPosition(city){
 }
 init();
 let allConnection = findAllConnections();
-//let destination = findPartialConnections('盖州', 1);
-//console.log(allConnection)
-for(let i = 0; i < allConnection.length; i++)
-  findPosition(allConnection[i][0]);
+let destination = findPartialConnections('宜昌东', 200, "time");
+console.log(destination)
+//for(let i = 0; i < allConnection.length; i++)
+//  findPosition(allConnection[i][0]);
 
 
 
