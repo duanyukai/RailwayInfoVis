@@ -1,7 +1,7 @@
 const train_ids = require('./train_ids.json')
 const train_infos = require('./train_infos.json')
 const train_list = require('./train_list.json')
-const city_infos = require("./city")
+const city_infos = require('./position.json')
 info = {} // {起点站：{到达站：{跳数，价格，时间}}}
 sumInfo = {} // {起点站：Set(重点站)}
 function init() {
@@ -53,7 +53,7 @@ function findAllConnections(){
   let res = [];
   for(const start in sumInfo){
     for(const end of sumInfo[start]){
-      res.push([start, end]);
+      res.push([findPosition(start), findPosition(end)]);
     }
   }
   return res;
@@ -86,7 +86,7 @@ function findPartialConnections(startPos, scale, dimension= 'step'){
   findDestinationByScale(startPos, scale, dimension, des);
   let res = [];
   for(const endPos of des){
-    res.push([startPos, endPos]);
+    res.push([findPosition(startPos), findPosition(endPos)]);
   }
   return res;
 }
@@ -97,10 +97,11 @@ function findPosition(city){
     for(let j = i + 1; j <= len; j++){
       let cur = city.substr(i, j - i);
       if(city_infos.hasOwnProperty(cur)) {
-        return [city_infos[cur]["longitude"], city_infos[cur]["latitude"]];
+        return [parseFloat(city_infos[cur]["longitude"]), parseFloat(city_infos[cur]["latitude"])];
       }
     }
   }
+  process.stdout.write(city + "\n");
   return [-1, -1];
 }
 
@@ -115,11 +116,11 @@ function show(dic){
 }
 
 init();
-let allConnection = findAllConnections();
-let destination = findLayerConnections('盖州', 200, 'time' );
-show(destination)
-/*for(let i = 0; i < allConnection.length; i++)
-  findPosition(allConnection[i][0]);*/
+let all = findAllConnections();
+let layer = findLayerConnections('盖州', 200, 'time' );
+let parcial = findPartialConnections('盖州', 200, 'time' );
+console.log(all)
+
 
 
 
