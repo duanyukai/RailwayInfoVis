@@ -5,8 +5,8 @@ const city_infos = require('./position.json')
 info = {} // {起点站：{到达站：{跳数，价格，时间}}}
 sumInfo = {} // {起点站：Set(重点站)}
 function init() {
-  for (const date in train_list) {
-    for (const type in train_list[date]) {
+  for (const date of Object.keys(train_list)) {
+    for (const type of Object.keys(train_list[date])) {
       const len = train_list[date][type].length;
       for (let idx = 0; idx < len; idx++) {
         let str = train_list[date][type][idx]['station_train_code'].split("(")[1].split(")")[0].split("-");
@@ -30,7 +30,7 @@ function init() {
             let curPos = train_info[i]["station_name"];
             info[startPos][curPos] = { 'step': step, 'price': price, 'time': time };
             // 从一个中途站到另一个中途站
-            for (const prePos in passPos) {
+            for (const prePos of Object.keys(passPos)) {
               if (!info.hasOwnProperty(prePos))
                 info[prePos] = {}
               info[prePos][curPos] = { 'step': step, 'price': price, 'time': time - passPos[prePos] };
@@ -51,7 +51,7 @@ function init() {
 
 function findAllConnections(){
   let res = [];
-  for(const start in sumInfo){
+  for(const start of Object.keys(sumInfo)){
     for(const end of sumInfo[start]){
       res.push([findPosition(start), findPosition(end)]);
     }
@@ -60,7 +60,7 @@ function findAllConnections(){
 }
 
 function findDestinationByScale(startPos, scale, dimension= 'step', res){
-  for(const endPos in info[startPos]){
+  for(const endPos of Object.keys(info[startPos])){
     if(info[startPos][endPos][dimension] <= scale && info[startPos][endPos][dimension] != 0 && !res.has(endPos)) {
       res.add(endPos);
       findDestinationByScale(endPos, scale - info[startPos][endPos][dimension], dimension, res);
@@ -84,7 +84,7 @@ function findLayerByScale(startPos, scale, dimension='step', set){
   res['name'] = startPos;
   res['children'] = []
   set.add(startPos)
-  for(const nextPos in info[startPos]){
+  for(const nextPos of Object.keys(info[startPos])){
     if(info[startPos][nextPos][dimension] <= scale && info[startPos][nextPos][dimension] != 0 && !set.has(nextPos)){
       res['children'].push(findLayerByScale(nextPos, scale - info[startPos][nextPos][dimension], dimension, set));
     }
