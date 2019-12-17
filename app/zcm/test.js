@@ -69,18 +69,6 @@ function findDestinationByScale(startPos, scale, dimension= 'step', res){
   return res;
 }
 
-function findLayerConnections(startPos, scale, dimension='step'){
-  let res = {};
-  res['name'] = startPos;
-  res['children'] = []
-  for(const nextPos in info[startPos]){
-    if(info[startPos][nextPos][dimension] <= scale && info[startPos][nextPos][dimension] != 0){
-      res['children'].push(findLayerConnections(nextPos, scale - info[startPos][nextPos][dimension], dimension));
-    }
-  }
-  return res;
-}
-
 function findPartialConnections(startPos, scale, dimension= 'step'){
   let des = new Set();
   findDestinationByScale(startPos, scale, dimension, des);
@@ -88,6 +76,25 @@ function findPartialConnections(startPos, scale, dimension= 'step'){
   for(const endPos of des){
     res.push([findPosition(startPos), findPosition(endPos)]);
   }
+  return res;
+}
+
+function findLayerByScale(startPos, scale, dimension='step', set){
+  let res = {};
+  res['name'] = startPos;
+  res['children'] = []
+  set.add(startPos)
+  for(const nextPos in info[startPos]){
+    if(info[startPos][nextPos][dimension] <= scale && info[startPos][nextPos][dimension] != 0 && !set.has(nextPos)){
+      res['children'].push(findLayerByScale(nextPos, scale - info[startPos][nextPos][dimension], dimension, set));
+    }
+  }
+  return res;
+}
+
+function findLayerConnections(startPos, scale, dimension='step'){
+  let set = new Set();
+  let res = findLayerByScale(startPos, scale, dimension, set)
   return res;
 }
 
@@ -119,8 +126,4 @@ init();
 let all = findAllConnections();
 let layer = findLayerConnections('盖州', 200, 'time' );
 let parcial = findPartialConnections('盖州', 200, 'time' );
-console.log(all)
-
-
-
-
+show(layer)
