@@ -88,25 +88,25 @@ function findLayerByScaleBFS(startPos, scale, dimension='step'){
   let set=new Set();
   let queue=new Queue();
 
-  queue.enqueue([res,startPos]);
+  queue.enqueue([res,startPos,scale]);
   set.add(startPos);
   while(!queue.isEmpty()){
     let v=queue.dequeue();
     let v_tree=v[0],v_id=v[1];
+    const scale=v[2];
     //console.log(v_id);
     if(info[v_id]===undefined) continue;
     for(const nextPos of Object.keys(info[v_id])){
       if(info[v_id][nextPos][dimension] <= scale && info[v_id][nextPos][dimension] !== 0 && !set.has(nextPos)){
         let t_res={'name':nextPos,'children':[]};
         v_tree['children'].push(t_res);
-        queue.enqueue([t_res,nextPos]);
+        queue.enqueue([t_res,nextPos,scale-info[v_id][nextPos][dimension]]);
         set.add(nextPos);
       }
     }
   }
   return res;
 }
-
 function findLayerByScale(startPos, scale, dimension='step', set){
   let res = {};
   res['name'] = startPos;
