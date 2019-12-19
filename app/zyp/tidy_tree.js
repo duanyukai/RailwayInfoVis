@@ -66,7 +66,7 @@ function radial_tree(data,div_id) {
             .attr("stroke-opacity", 0);
 
         new_nodes.append("circle")
-            .attr("fill", d => d.children ? "#555" : "#999")
+            .attr("fill", d => d.children || d._children ?  "#555" : "#999")
             .attr("id", d => `c${d.id}`)
             .attr("r", circle_r);
 
