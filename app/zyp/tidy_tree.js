@@ -101,7 +101,7 @@ function radial_tree(data,div_id) {
         svg.attr("transform", d3.event.transform);
     }
 
-    const base_svg = d3.select(div_id).append("svg")
+    const base_svg = d3.select(`#${div_id}`).append("svg")
         .style("height", 'auto')
         .style("font", "14px sans-serif")
         .style("margin", "5px");
