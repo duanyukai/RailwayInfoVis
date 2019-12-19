@@ -1,7 +1,7 @@
 /*const train_ids = require('./train_ids.json')
 const train_infos = require('./train_infos.json')
-const train_list = require('./train_list.json')
-const city_infos = require('./position.json')*/
+const train_list = require('./train_list.json')*/
+const city_infos = require('./position.json');
 const info = require('./info.json'); // {起点站：{到达站：{跳数，价格，时间}}}
 const sumInfo = require('./sumInfo.json'); // {起点站：Set(重点站)}
 /*function init() {
@@ -82,6 +82,7 @@ function findPartialConnections(startPos, scale, dimension= 'step'){
   }
   return res;
 }
+
 function findLayerByScaleBFS(startPos, scale, dimension='step'){
   let res = {'name':startPos,'children':[]};
   let set=new Set();
@@ -105,6 +106,7 @@ function findLayerByScaleBFS(startPos, scale, dimension='step'){
   }
   return res;
 }
+
 function findLayerByScale(startPos, scale, dimension='step', set){
   let res = {};
   res['name'] = startPos;
@@ -119,21 +121,14 @@ function findLayerByScale(startPos, scale, dimension='step', set){
 }
 
 function findLayerConnections(startPos, scale, dimension='step'){
-  //let set = new Set();
-  //return findLayerByScale(startPos, scale, dimension, set);
-  return findLayerByScaleBFS(startPos, scale, dimension);
+  let set = new Set();
+  return findLayerByScale(startPos, scale, dimension, set);
+  //return findLayerByScaleBFS(startPos, scale, dimension);
 }
 
 function findPosition(city){
-  const len = city.length;
-  for(let i = 0; i < len; i++){
-    for(let j = i + 1; j <= len; j++){
-      let cur = city.substr(i, j - i);
-      if(city_infos.hasOwnProperty(cur)) {
-        return [parseFloat(city_infos[cur]["longitude"]), parseFloat(city_infos[cur]["latitude"])];
-      }
-    }
-  }
+  if(city_infos.hasOwnProperty(city))
+    return [parseFloat(city_infos[city]["longitude"]), parseFloat(city_infos[city]["latitude"])];
   return [-1, -1];
 }
 
@@ -150,4 +145,5 @@ function show(dic){
 let all = findAllConnections();
 let layer = findLayerConnections('盖州', 200, 'time' );
 let parcial = findPartialConnections('盖州', 200, 'time' );
-show(layer);
+console.log(parcial)
+//show(parcial);
