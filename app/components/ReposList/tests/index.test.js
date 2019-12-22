@@ -1,7 +1,7 @@
 import { shallow, mount } from 'enzyme';
 import React from 'react';
 
-import RepoListItem from 'containers/RepoListItem';
+import RepoListItem from 'containers/_RepoListItem';
 import List from 'components/List';
 import LoadingIndicator from 'components/LoadingIndicator';
 import ReposList from '../index';

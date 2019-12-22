@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Switch, Route } from 'react-router-dom';
 
 import MapPage from 'containers/MapPage/Loadable';
-import FeaturePage from 'containers/FeaturePage/Loadable';
+import FeaturePage from 'containers/_FeaturePage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import Header from 'components/Header';
 import Footer from 'components/Footer';

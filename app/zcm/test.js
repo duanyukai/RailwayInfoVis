@@ -1,10 +1,10 @@
-/*const train_ids = require('./train_ids.json')
+/* const train_ids = require('./train_ids.json')
 const train_infos = require('./train_infos.json')
-const train_list = require('./train_list.json')*/
+const train_list = require('./train_list.json') */
 const city_infos = require('./position.json');
 const info = require('./info.json'); // {起点站：{到达站：{跳数，价格，时间}}}
 const sumInfo = require('./sumInfo.json'); // {起点站：Set(重点站)}
-/*function init() {
+/* function init() {
   for (const date of Object.keys(train_list)) {
     for (const type of Object.keys(train_list[date])) {
       const len = train_list[date][type].length;
@@ -51,21 +51,21 @@ const sumInfo = require('./sumInfo.json'); // {起点站：Set(重点站)}
   //for(const key of Object.keys(sumInfo)){
   //  sumInfo[key]=[...sumInfo[key]];
   //}
-}*/
+} */
 
-function findAllConnections(){
-  let res = [];
-  for(const start of Object.keys(sumInfo)){
-    for(const end of sumInfo[start]){
+function findAllConnections() {
+  const res = [];
+  for (const start of Object.keys(sumInfo)) {
+    for (const end of sumInfo[start]) {
       res.push([findPosition(start), findPosition(end)]);
     }
   }
   return res;
 }
 
-function findDestinationByScale(startPos, scale, dimension= 'step', res){
-  for(const endPos of Object.keys(info[startPos])){
-    if(info[startPos][endPos][dimension] <= scale && info[startPos][endPos][dimension] !== 0 && !res.has(endPos)) {
+function findDestinationByScale(startPos, scale, dimension = 'step', res) {
+  for (const endPos of Object.keys(info[startPos])) {
+    if (info[startPos][endPos][dimension] <= scale && info[startPos][endPos][dimension] !== 0 && !res.has(endPos)) {
       res.add(endPos);
       findDestinationByScale(endPos, scale - info[startPos][endPos][dimension], dimension, res);
     }
@@ -73,78 +73,76 @@ function findDestinationByScale(startPos, scale, dimension= 'step', res){
   return res;
 }
 
-function findPartialConnections(startPos, scale, dimension= 'step'){
-  let des = new Set();
+function findPartialConnections(startPos, scale, dimension = 'step') {
+  const des = new Set();
   findDestinationByScale(startPos, scale, dimension, des);
-  let res = [];
-  for(const endPos of des){
+  const res = [];
+  for (const endPos of des) {
     res.push([findPosition(startPos), findPosition(endPos)]);
   }
   return res;
 }
 
-function findLayerByScaleBFS(startPos, scale, dimension='step'){
-  let res = {'name':startPos,'value':0,'children':[]};
-  let set=new Set();
-  let queue=new Queue();
+function findLayerByScaleBFS(startPos, scale, dimension = 'step') {
+  const res = { name: startPos, value: 0, children: [] };
+  const set = new Set();
+  const queue = new Queue();
 
-  queue.enqueue([res,startPos,0]);
+  queue.enqueue([res, startPos, 0]);
   set.add(startPos);
-  while(!queue.isEmpty()){
-    let v=queue.dequeue();
-    let v_tree=v[0],v_id=v[1];
-    const accumulate_val=v[2];
-    //console.log(v_id);
-    if(info[v_id]===undefined) continue;
-    for(const nextPos of Object.keys(info[v_id])){
-      let value=info[v_id][nextPos][dimension];
-      if( value !== 0 && accumulate_val + value <= scale && !set.has(nextPos)){
-        let t_res={'name':nextPos,'value':accumulate_val+value,'children':[]};
-        v_tree['children'].push(t_res);
-        queue.enqueue([t_res,nextPos,accumulate_val+value]);
+  while (!queue.isEmpty()) {
+    const v = queue.dequeue();
+    const v_tree = v[0]; const v_id = v[1];
+    const accumulate_val = v[2];
+    // console.log(v_id);
+    if (info[v_id] === undefined) continue;
+    for (const nextPos of Object.keys(info[v_id])) {
+      const value = info[v_id][nextPos][dimension];
+      if (value !== 0 && accumulate_val + value <= scale && !set.has(nextPos)) {
+        const t_res = { name: nextPos, value: accumulate_val + value, children: [] };
+        v_tree.children.push(t_res);
+        queue.enqueue([t_res, nextPos, accumulate_val + value]);
         set.add(nextPos);
       }
     }
   }
   return res;
 }
-function findLayerByScale(startPos, scale, dimension='step', set){
-  let res = {};
-  res['name'] = startPos;
-  res['children'] = [];
+function findLayerByScale(startPos, scale, dimension = 'step', set) {
+  const res = {};
+  res.name = startPos;
+  res.children = [];
   set.add(startPos);
-  for(const nextPos of Object.keys(info[startPos])){
-    if(info[startPos][nextPos][dimension] <= scale && info[startPos][nextPos][dimension] !== 0 && !set.has(nextPos)){
-      res['children'].push(findLayerByScale(nextPos, scale - info[startPos][nextPos][dimension], dimension, set));
+  for (const nextPos of Object.keys(info[startPos])) {
+    if (info[startPos][nextPos][dimension] <= scale && info[startPos][nextPos][dimension] !== 0 && !set.has(nextPos)) {
+      res.children.push(findLayerByScale(nextPos, scale - info[startPos][nextPos][dimension], dimension, set));
     }
   }
   return res;
 }
 
-function findLayerConnections(startPos, scale, dimension='step'){
-  let set = new Set();
+function findLayerConnections(startPos, scale, dimension = 'step') {
+  const set = new Set();
   return findLayerByScale(startPos, scale, dimension, set);
-  //return findLayerByScaleBFS(startPos, scale, dimension);
+  // return findLayerByScaleBFS(startPos, scale, dimension);
 }
 
-function findPosition(city){
-  if(city_infos.hasOwnProperty(city))
-    return [parseFloat(city_infos[city]["longitude"]), parseFloat(city_infos[city]["latitude"])];
+function findPosition(city) {
+  if (city_infos.hasOwnProperty(city)) return [parseFloat(city_infos[city].longitude), parseFloat(city_infos[city].latitude)];
   return [-1, -1];
 }
 
-function show(dic){
-  process.stdout.write('{name:' + dic['name']);
-  process.stdout.write(' children:[')
-  for(let i = 0; i < dic['children'].length; i++){
-    show(dic['children'][i]);
+function show(dic) {
+  process.stdout.write(`{name:${dic.name}`);
+  process.stdout.write(' children:[');
+  for (let i = 0; i < dic.children.length; i++) {
+    show(dic.children[i]);
   }
-  process.stdout.write("]");
-  process.stdout.write("}\n");
+  process.stdout.write(']');
+  process.stdout.write('}\n');
 }
 
-let all = findAllConnections();
-let layer = findLayerConnections('盖州', 200, 'time' );
-let parcial = findPartialConnections('盖州', 200, 'time' );
-console.log(parcial)
-//show(parcial);
+const all = findAllConnections();
+const layer = findLayerConnections('盖州', 200, 'time');
+const parcial = findPartialConnections('盖州', 200, 'time');
+console.log(parcial);

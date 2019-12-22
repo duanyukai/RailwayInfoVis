@@ -1,5 +1,22 @@
+.main-wrapper {
+  position: relative;
+}
+
 .map-wrapper {
   //background: #f00;
   width: 100%;
   height: 100vh;
+}
+
+.left-pane {
+  z-index: 9999;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 400px;
+  min-height: 400px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 8px;
 }
