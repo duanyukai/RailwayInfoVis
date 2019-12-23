@@ -124,7 +124,8 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
       // console.log("车站变了");
       // 重新绘制可达信息
       // 删除旧图层
-      let connections = findPartialConnections(this.state.curStation, this.state.curShowLimit, this.state.curShowType);  // 坐标对
+      // let connections = findPartialConnections(this.state.curStation, this.state.curShowLimit, this.state.curShowType);  // 坐标对
+      let connections = findLayerPositionConnections(this.state.curStation, this.state.curShowLimit, this.state.curShowType);  // 坐标对
       console.log(connections);
       // 重新绘制新图层
       if (this.lineLayer)
@@ -173,8 +174,8 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
             <div style={{ textAlign: 'center' }}>
               <ButtonGroup>
                 <Button
-                  variant={curShowType === 'hop' ? 'secondary' : 'outline-secondary'}
-                  onClick={() => this.setState({ curShowType: 'hop' })}
+                  variant={curShowType === 'step' ? 'secondary' : 'outline-secondary'}
+                  onClick={() => this.setState({ curShowType: 'step' })}
                 >
                   跳数范围
                 </Button>
@@ -192,25 +193,25 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
                   onChange={(e) => this.setState({curShowLimit: e.target.value})}
                 />
                 <InputGroup.Append>
-                  <InputGroup.Text id="basic-addon2">{{ hop: '跳', time: '分钟' }[curShowType]}</InputGroup.Text>
+                  <InputGroup.Text id="basic-addon2">{{ step: '跳', time: '分钟' }[curShowType]}</InputGroup.Text>
                 </InputGroup.Append>
               </InputGroup>
             </div>
             <hr />
             <Table striped bordered hover>
               <thead>
-                <tr>
-                  <th>可达目的车站</th>
-                  <th>车次</th>
-                  <th>时间</th>
-                </tr>
+              <tr>
+                <th>可达目的车站</th>
+                <th>车次</th>
+                <th>时间</th>
+              </tr>
               </thead>
               <tbody>
-                {/*<tr>*/}
-                {/*  <td>沈阳站</td>*/}
-                {/*  <td>G237</td>*/}
-                {/*  <td>235min</td>*/}
-                {/*</tr>*/}
+              {/*<tr>*/}
+              {/*  <td>沈阳站</td>*/}
+              {/*  <td>G237</td>*/}
+              {/*  <td>235min</td>*/}
+              {/*</tr>*/}
               </tbody>
             </Table>
           </div>
@@ -226,13 +227,13 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
                 variant={curMapType === 'radial' ? 'secondary' : 'outline-secondary'}
                 onClick={() => this.setState({ curMapType: 'radial' })}
               >
-                  RadialMap
+                RadialMap
               </Button>
               <Button
                 variant={curMapType === 'tree' ? 'secondary' : 'outline-secondary'}
                 onClick={() => this.setState({ curMapType: 'tree' })}
               >
-                  TreeMap
+                TreeMap
               </Button>
             </ButtonGroup>
             <div id="tree_div" />

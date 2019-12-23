@@ -192,32 +192,49 @@ export function show(dic) {
   console.log('}\n');
 }
 
-function findLayerPositionByScaleAndDepth(startPos, scale, dimension='step', set, list, curDepth, maxDepth){
+// function findLayerPositionByScaleAndDepth(startPos, scale, dimension='step', set, list, curDepth, maxDepth){
+//   set.add(startPos);
+//   if(curDepth >= maxDepth)
+//     return;
+//   if(!list.hasOwnProperty(curDepth))
+//     list[curDepth] = []
+//   for(const nextPos of Object.keys(info[startPos])){
+//     if(info[startPos][nextPos][dimension] <= scale && info[startPos][nextPos][dimension] !== 0 && !set.has(nextPos)){
+//       list[curDepth].push(findPosition(startPos), findPosition(nextPos));
+//       findLayerPositionByScaleAndDepth(nextPos, scale - info[startPos][nextPos][dimension], dimension, set, list, curDepth + 1, maxDepth);
+//     }
+//   }
+// }
+//
+// /**
+//  * 有层的坐标线
+//  * @param startPos
+//  * @param scale
+//  * @param dimension
+//  * @param maxDepth
+//  * @returns {{}}
+//  */
+// export function findLayerPositionConnections(startPos, scale, dimension='step', maxDepth = 1000){
+//   let set = new Set();
+//   let list = {};
+//   findLayerPositionByScaleAndDepth(startPos, scale, dimension, set, list, 0, maxDepth);
+//   return list;
+// }
+
+export function findLayerPositionByScale(startPos, scale, dimension='step', set, list){
   set.add(startPos);
-  if(curDepth >= maxDepth)
-    return;
-  if(!list.hasOwnProperty(curDepth))
-    list[curDepth] = []
   for(const nextPos of Object.keys(info[startPos])){
     if(info[startPos][nextPos][dimension] <= scale && info[startPos][nextPos][dimension] !== 0 && !set.has(nextPos)){
-      list[curDepth].push(findPosition(startPos), findPosition(nextPos));
-      findLayerPositionByScaleAndDepth(nextPos, scale - info[startPos][nextPos][dimension], dimension, set, list, curDepth + 1, maxDepth);
+      list.push([findPosition(startPos), findPosition(nextPos)]);
+      findLayerPositionByScale(nextPos, scale - info[startPos][nextPos][dimension], dimension, set, list);
     }
   }
 }
 
-/**
- * 有层的坐标线
- * @param startPos
- * @param scale
- * @param dimension
- * @param maxDepth
- * @returns {{}}
- */
-export function findLayerPositionConnections(startPos, scale, dimension='step', maxDepth = 1000){
+export function findLayerPositionConnections(startPos, scale, dimension='step'){
   let set = new Set();
-  let list = {};
-  findLayerPositionByScaleAndDepth(startPos, scale, dimension, set, list, 0, maxDepth);
+  let list = [];
+  findLayerPositionByScale(startPos, scale, dimension, set, list);
   return list;
 }
 
@@ -229,5 +246,3 @@ export function test() {
   console.log(layer);
   console.log(parcial);
 }
-
-
