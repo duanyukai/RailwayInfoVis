@@ -28,13 +28,13 @@
   right: 10px;
   bottom: 20px;
   width: 260px;
-  height: 260px;
+  height: 130px;
   background: #eee;
   border: 1px solid #ccc;
   border-radius: 3px;
   padding: 4px;
   transition: width 0.5s, height 0.5s;
-  overflow: hidden;
+  overflow: scroll;
 }
 
 .right-pane-large {

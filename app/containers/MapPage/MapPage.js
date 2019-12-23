@@ -9,7 +9,7 @@ import {
 import {
   findAllConnections,
   findAllConnectionsFDEB,
-  findLayerConnections,
+  findLayerConnections, findLayerPositionConnections,
   findPartialConnections,
   test,
 } from './maputils/maputils';
@@ -123,10 +123,27 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
     if (prevState.curStation !== this.state.curStation || prevState.curMapType !== this.state.curMapType) {
       // console.log("车站变了");
       // 重新绘制可达信息
+      // 删除旧图层
+      let connections = findPartialConnections(this.state.curStation, this.state.curShowLimit, this.state.curShowType);  // 坐标对
+      console.log(connections);
+      // 重新绘制新图层
+      if (this.lineLayer)
+        this.lfMap.removeLayer(this.lineLayer);
+
+      let lines = connections.map(latlng => {
+        return L.polyline(latlng, {
+          pane: 'railway-line-pane',
+          opacity: 1
+        }).addTo(this.lfMap);
+      });
+      console.log('画的线', lines);
+      this.lineLayer = L.layerGroup(lines);
+      this.lfMap.addLayer(this.lineLayer);
 
       // 重新绘制tree map和radial map todo
       const layer = findLayerConnections(this.state.curStation, 200, 'time');
       // treeMap(layer, 'tree_div');
+
       if (this.state.curMapType === 'radial') {
         radial_tree(layer, 'tree_div');
       } else {
@@ -171,6 +188,8 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
               <InputGroup className="mb-3" style={{ marginTop: 3 }}>
                 <FormControl
                   placeholder=""
+                  value={this.state.curShowLimit}
+                  onChange={(e) => this.setState({curShowLimit: e.target.value})}
                 />
                 <InputGroup.Append>
                   <InputGroup.Text id="basic-addon2">{{ hop: '跳', time: '分钟' }[curShowType]}</InputGroup.Text>
@@ -187,11 +206,11 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>沈阳站</td>
-                  <td>G237</td>
-                  <td>235min</td>
-                </tr>
+                {/*<tr>*/}
+                {/*  <td>沈阳站</td>*/}
+                {/*  <td>G237</td>*/}
+                {/*  <td>235min</td>*/}
+                {/*</tr>*/}
               </tbody>
             </Table>
           </div>
