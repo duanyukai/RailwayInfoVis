@@ -221,12 +221,12 @@ export function show(dic) {
 //   return list;
 // }
 
-export function findLayerPositionByScale(startPos, scale, dimension='step', set, list){
+export function findLayerPositionByScale(root, startPos, scale, dimension='step', set, list){
   set.add(startPos);
   for(const nextPos of Object.keys(info[startPos])){
     if(info[startPos][nextPos][dimension] <= scale && info[startPos][nextPos][dimension] !== 0 && !set.has(nextPos)){
-      list.push([findPosition(startPos), findPosition(nextPos)]);
-      findLayerPositionByScale(nextPos, scale - info[startPos][nextPos][dimension], dimension, set, list);
+      list.push([findPosition(root), findPosition(nextPos)]);
+      findLayerPositionByScale(root, nextPos, scale - info[startPos][nextPos][dimension], dimension, set, list);
     }
   }
 }
@@ -234,7 +234,7 @@ export function findLayerPositionByScale(startPos, scale, dimension='step', set,
 export function findLayerPositionConnections(startPos, scale, dimension='step'){
   let set = new Set();
   let list = [];
-  findLayerPositionByScale(startPos, scale, dimension, set, list);
+  findLayerPositionByScale(startPos, startPos, scale, dimension, set, list);
   return list;
 }
 

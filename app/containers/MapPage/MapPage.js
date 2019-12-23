@@ -120,7 +120,7 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
 
   componentDidUpdate(prevProps, prevState) {
     // state更新时，对地图进行对应的重绘
-    if (prevState.curStation !== this.state.curStation || prevState.curMapType !== this.state.curMapType) {
+    if (prevState.curStation !== this.state.curStation || prevState.curMapType !== this.state.curMapType || prevState.curShowLimit !== this.state.curShowLimit) {
       // console.log("车站变了");
       // 重新绘制可达信息
       // 删除旧图层
@@ -198,22 +198,22 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
               </InputGroup>
             </div>
             <hr />
-            <Table striped bordered hover>
-              <thead>
-              <tr>
-                <th>可达目的车站</th>
-                <th>车次</th>
-                <th>时间</th>
-              </tr>
-              </thead>
-              <tbody>
-              {/*<tr>*/}
-              {/*  <td>沈阳站</td>*/}
-              {/*  <td>G237</td>*/}
-              {/*  <td>235min</td>*/}
-              {/*</tr>*/}
-              </tbody>
-            </Table>
+            {/*<Table striped bordered hover>*/}
+            {/*  <thead>*/}
+            {/*  <tr>*/}
+            {/*    <th>可达目的车站</th>*/}
+            {/*    <th>车次</th>*/}
+            {/*    <th>时间</th>*/}
+            {/*  </tr>*/}
+            {/*  </thead>*/}
+            {/*  <tbody>*/}
+            {/*  /!*<tr>*!/*/}
+            {/*  /!*  <td>沈阳站</td>*!/*/}
+            {/*  /!*  <td>G237</td>*!/*/}
+            {/*  /!*  <td>235min</td>*!/*/}
+            {/*  /!*</tr>*!/*/}
+            {/*  </tbody>*/}
+            {/*</Table>*/}
           </div>
           {/* 右侧边栏 */}
           <div className={`right-pane${isRightPanelLarge ? ' right-pane-large' : ''}`}>
