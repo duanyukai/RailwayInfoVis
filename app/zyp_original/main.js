@@ -38,4 +38,3 @@ Promise.all([
     d3.json("../data/info.json"),
     d3.json("../data/sumInfo.json"),
 ]).then(data=>main(data)).catch(error=>console.log(error));
-
