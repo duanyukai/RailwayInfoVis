@@ -8,7 +8,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
   render() {
     return (
       <div className="header">
-        <Navbar bg="dark" variant="dark">
+        <Navbar bg="dark" variant="dark" fixed="top">
           <Navbar.Brand href="#home">铁路信息可视化</Navbar.Brand>
           <Nav className="mr-auto">
             <Nav.Link href="#home">地图</Nav.Link>

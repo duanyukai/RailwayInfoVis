@@ -1,13 +1,11 @@
 {
-  "name": "react-redux-boilerplate",
+  "name": "railwayinfovis",
   "version": "1.0.0",
-  "description": "A minimal react-redux boilerplate with all the best practices",
+  "description": "railwayinfovis",
   "repository": {
     "type": "git",
-    "url": "git://github.com/flexdinesh/react-redux-boilerplate.git"
+    "url": "https://github.com/duanyukai/RailwayInfoVis"
   },
-  "license": "MIT",
-  "author": "Dinesh Pandiyan",
   "scripts": {
     "prebuild": "npm run build:clean",
     "build": "cross-env NODE_ENV=production webpack --config config/webpack.prod.babel.js --color -p --progress --hide-modules --display-optimization-bailout",
@@ -33,6 +31,7 @@
     "compression": "1.7.4",
     "connected-react-router": "^6.4.0",
     "cross-env": "5.2.0",
+    "d3": "^5.14.2",
     "express": "4.17.1",
     "fontfaceobserver": "2.1.0",
     "history": "4.9.0",

@@ -4,6 +4,9 @@ import { Helmet } from 'react-helmet';
 import './style.scss';
 import L from 'leaflet';
 import {
+  Button, ButtonGroup, FormControl, InputGroup, Modal, Table
+} from 'react-bootstrap';
+import {
   findAllConnections,
   findAllConnectionsFDEB,
   findLayerConnections,
@@ -12,21 +15,25 @@ import {
 } from './maputils/maputils';
 
 import cityPositions from './data/position.json';
-import { Button, ButtonGroup, Modal } from 'react-bootstrap';
+import { treeMap } from './zyputils/treemap';
+import { radial_tree } from './zyputils/tidy_tree';
 
 export default class MapPage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
 
     this.state = {
-      curStation: "北京", // 当前站点名称，用于显示
-      showZYPModal: false,
+      curStation: '北京', // 当前站点名称，用于显示
+      curShowType: 'time', // 当前显示的路线类别
+      curMapType: 'radial', // 当前右侧面板显示类型
+      curShowLimit: '200', // 当前选择站点的限制（时间、跳数）
       showStationRadius: true, // 配置项，是否显示大小
+      isRightPanelLarge: false // 右侧面板大小展开控制
     };
   }
 
   componentDidMount() {
-    let self = this;
+    const self = this;
     this.lfMap = L.map(this.lfMapDOM, {
       // maxZoom: 2, // todo
       // minZoom: 5,
@@ -60,7 +67,7 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
     }).addTo(this.lfMap);
 
     // 测试绘制所有线段
-    let connections = findAllConnections();
+    const connections = findAllConnections();
     // let connections = findAllConnectionsFDEB();
     // let connections = findLayerConnections('盖州', 200, 'time');
     // let connections = findPartialConnections('盖州', 200, 'time');
@@ -68,7 +75,7 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
     console.log(connections);
     // return;
 
-    connections.slice(0, 1).forEach(line => {
+    connections.slice(0, 1).forEach((line) => {
       L.polyline(line, {
         pane: 'railway-line-pane',
         opacity: 0.1
@@ -77,15 +84,16 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
 
     // 绘制所有车站坐标
     console.log('车站数量', Object.keys(cityPositions));
-    Object.keys(cityPositions).forEach(stationName => {
-      let cityLatLng = [cityPositions[stationName].latitude, cityPositions[stationName].longitude];
-      let radius = [0, 5, 5, 4, 3, 2, 1, 1][cityPositions[stationName].level];
-      let opacity = [0, 1, 0.9, 0.9, 0.8, 0.8, 0.7, 0.7][cityPositions[stationName].level];
+    Object.keys(cityPositions).forEach((stationName) => {
+      const cityLatLng = [cityPositions[stationName].latitude, cityPositions[stationName].longitude];
+      const radius = [0, 5, 5, 4, 3, 2, 1, 1][cityPositions[stationName].level];
+      const opacity = [0, 1, 0.9, 0.9, 0.8, 0.8, 0.7, 0.7][cityPositions[stationName].level];
+      const color = ['', '#00aa00', '#00aa00', '#00cc00', '#66cc66', '#66dd66', '#88dd88', '#88ee88'][cityPositions[stationName].level];
       // console.log(radius);
-      let circleMarker = L.circleMarker(cityLatLng, {
+      const circleMarker = L.circleMarker(cityLatLng, {
         pane: 'station-line-pane',
-        radius: radius,
-        opacity: opacity,
+        radius,
+        opacity,
         color: '#00aa00'
       });
       circleMarker.stationName = stationName; // 绑定城市数据
@@ -98,7 +106,7 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
       });
     });
 
-    this.lfMap.on('zoomend', function() {
+    this.lfMap.on('zoomend', () => {
       console.log('缩放级别', self.lfMap.getZoom());
       // 默认缩放级别5，仅显示12线城市，6到以上显示所有城市
       // if (map.getZoom() < 7){
@@ -112,15 +120,26 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
 
   componentDidUpdate(prevProps, prevState) {
     // state更新时，对地图进行对应的重绘
-    if (prevState.curStation !== this.state.curStation) {
+    if (prevState.curStation !== this.state.curStation || prevState.curMapType !== this.state.curMapType) {
       // console.log("车站变了");
       // 重新绘制可达信息
 
+      // 重新绘制tree map和radial map todo
+      const layer = findLayerConnections(this.state.curStation, 200, 'time');
+      // treeMap(layer, 'tree_div');
+      if (this.state.curMapType === 'radial') {
+        radial_tree(layer, 'tree_div');
+      } else {
+        treeMap(layer, 'tree_div');
+      }
     }
   }
 
   render() {
-    const {curStation, showZYPModal} = this.state;
+    const self = this;
+    const {
+      curStation, curShowType, curShowLimit, curMapType, isRightPanelLarge
+    } = this.state;
     return (
       <div>
         <Helmet>
@@ -128,42 +147,77 @@ export default class MapPage extends React.PureComponent { // eslint-disable-lin
           <meta name="description" content="铁路信息可视化" />
         </Helmet>
         <div className="main-wrapper">
-          {/*地图图层*/}
-          <div className="map-wrapper" ref={m => this.lfMapDOM = m} />
-          {/*左侧边栏*/}
+          {/* 地图图层 */}
+          <div className="map-wrapper" ref={(m) => this.lfMapDOM = m} />
+          {/* 左侧边栏 */}
           <div className="left-pane">
-            <div style={{textAlign:'center', fontSize: 18, fontWeight: 'bold'}}>{curStation}站</div>
+            <div style={{ textAlign: 'center', fontSize: 18, fontWeight: 'bold' }}>{curStation}站</div>
             <hr />
-            <div style={{textAlign:'center'}}>
+            <div style={{ textAlign: 'center' }}>
               <ButtonGroup>
-                <Button variant="secondary">跳数范围</Button>
-                <Button variant="secondary">时间范围</Button>
+                <Button
+                  variant={curShowType === 'hop' ? 'secondary' : 'outline-secondary'}
+                  onClick={() => this.setState({ curShowType: 'hop' })}
+                >
+                  跳数范围
+                </Button>
+                <Button
+                  variant={curShowType === 'time' ? 'secondary' : 'outline-secondary'}
+                  onClick={() => this.setState({ curShowType: 'time' })}
+                >
+                  时间范围
+                </Button>
               </ButtonGroup>
+              <InputGroup className="mb-3" style={{ marginTop: 3 }}>
+                <FormControl
+                  placeholder=""
+                />
+                <InputGroup.Append>
+                  <InputGroup.Text id="basic-addon2">{{ hop: '跳', time: '分钟' }[curShowType]}</InputGroup.Text>
+                </InputGroup.Append>
+              </InputGroup>
             </div>
-            <Button onClick={() => this.setState({showZYPModal: true})}>显示zyp图</Button>
+            <hr />
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>可达目的车站</th>
+                  <th>车次</th>
+                  <th>时间</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>沈阳站</td>
+                  <td>G237</td>
+                  <td>235min</td>
+                </tr>
+              </tbody>
+            </Table>
           </div>
-          {/*右侧边栏*/}
-          <div>
-            <Modal
-              size="lg"
-              centered
-              show={showZYPModal}
-              onHide={() => this.setState({showZYPModal: false})}
+          {/* 右侧边栏 */}
+          <div className={`right-pane${isRightPanelLarge ? ' right-pane-large' : ''}`}>
+            <Button
+              onClick={() => this.setState({ isRightPanelLarge: !isRightPanelLarge })}
             >
-              <Modal.Header closeButton>
-                <Modal.Title id="contained-modal-title-vcenter">
-                  Modal heading
-                </Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <h4>Centered Modal</h4>
-                <p>
-                  Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-                  dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
-                  consectetur ac, vestibulum at eros.
-                </p>
-              </Modal.Body>
-            </Modal>
+              {isRightPanelLarge ? '↘' : '↖'}
+            </Button>{' '}
+            <ButtonGroup>
+              <Button
+                variant={curMapType === 'radial' ? 'secondary' : 'outline-secondary'}
+                onClick={() => this.setState({ curMapType: 'radial' })}
+              >
+                  RadialMap
+              </Button>
+              <Button
+                variant={curMapType === 'tree' ? 'secondary' : 'outline-secondary'}
+                onClick={() => this.setState({ curMapType: 'tree' })}
+              >
+                  TreeMap
+              </Button>
+            </ButtonGroup>
+            <div id="tree_div" />
+            <div className="tooltip" />
           </div>
         </div>
       </div>

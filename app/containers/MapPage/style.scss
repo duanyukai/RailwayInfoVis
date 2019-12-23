@@ -9,14 +9,36 @@
 }
 
 .left-pane {
-  z-index: 9999;
+  z-index: 1038;
   position: absolute;
   left: 10px;
-  top: 10px;
+  top: 70px;
   width: 400px;
   min-height: 400px;
-  background: white;
+  background: #eee;
   border: 1px solid #ccc;
   border-radius: 3px;
   padding: 8px;
+}
+
+
+.right-pane {
+  z-index: 1039;
+  position: absolute;
+  right: 10px;
+  bottom: 20px;
+  width: 260px;
+  height: 260px;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 4px;
+  transition: width 0.5s, height 0.5s;
+  overflow: hidden;
+}
+
+.right-pane-large {
+  width: 80vw;
+  height: 80vh;
+  transition: width 0.5s, height 0.5s;
 }

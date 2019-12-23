@@ -21,7 +21,7 @@ function main(data){
     console.log(layer);
 
     //radial_tree(layer,'tree_div');
-    tree_map(layer,'tree_div');
+    treeMap(layer,'tree_div');
     //downloadTextFile(JSON.stringify(sumInfo),"sumInfo.json");
 
 }
